@@ -25,7 +25,7 @@ jobs:
       tasks: 'build'
   - task: PublishBuildArtifacts@1
     inputs:
-      pathtoPublish: '$(System.DefaultWorkingDirectory)/build/libs'
+      pathtoPublish: '$(System.DefaultWorkingDirectory)/build/libs/bert-1.0-SNAPSHOT-all'
       artifactName: 'bert'
   #- task: PublishCodeCoverageResults@1
   #  inputs:
