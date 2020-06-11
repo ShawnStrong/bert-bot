@@ -32,10 +32,11 @@ public class BertListener extends ListenerAdapter {
                 user.openPrivateChannel().queue((channel) -> {
                     channel.sendMessage("I'm here to annoy you, Bert.").queue();
                 });
-        }
 
-        if (event.getMessage().getContentRaw().equals("!bert")) {
-            event.getChannel().sendMessage("bert statistics: ").queue();
+            case "!bert":
+                event.getChannel().sendMessage("bert statistics: ").queue();
+
+
         }
     }
 
