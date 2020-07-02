@@ -1,0 +1,74 @@
+# Docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- master
+
+resources:
+- repo: self
+
+variables:
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: 'Container Registry Connection - bert-bot'
+  imageRepository: 'web'
+  registryName: 'bertbotregistry22180.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/pipelines/Dockerfile'
+  tag: '$(Build.BuildId)'
+  webAppName: 'bert-bot-22180'
+  
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+stages:
+- stage: Build
+  displayName: Build and push stage
+  jobs:  
+  - job: GradleBuild
+    steps:
+    - task: Gradle@2
+      inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        gradleOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.11'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: true
+        testResultsFiles: '**/TEST-*.xml'
+        tasks: 'build'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathtoPublish: '$(System.DefaultWorkingDirectory)/build/libs/bert-1.0-SNAPSHOT-all.jar'
+        artifactName: 'bert'
+  - job: DockerBuild
+    dependsOn: GradleBuild
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        buildContext: $(Build.ArtifactStagingDirectory)
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+- stage: 'Deploy'
+  displayName: 'Deploy the container'
+  dependsOn: Build
+  jobs:
+  - job: 'Deploy'
+    displayName: 'Deploy job'
+    pool:
+      vmImage: 'ubuntu-18.04'
+    #variables:
+    #- group: Release
+    steps:
+    - task: AzureWebAppContainer@1
+      inputs:
+       appName: $(webAppName)
+       azureSubscription: 'Resource Manager - bert-bot'
+       imageName: $(registryName)/$(imageRepository):$(build.buildId)
