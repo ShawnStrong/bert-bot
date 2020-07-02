@@ -25,7 +25,6 @@ stages:
   displayName: Build and push stage
   jobs:  
   - job: GradleBuild
-    displayName: Gradle-Build
     steps:
     - task: Gradle@2
       inputs:
@@ -43,7 +42,7 @@ stages:
         pathtoPublish: '$(System.DefaultWorkingDirectory)/build/libs/bert-1.0-SNAPSHOT-all.jar'
         artifactName: 'bert'
   - job: DockerBuild
-    displayName: Docker-Build
+    dependsOn: GradleBuild
     pool:
       vmImage: $(vmImageName)
     steps:
