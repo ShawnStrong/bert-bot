@@ -10,11 +10,12 @@ resources:
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '7033b300-b62b-47c4-8f3b-ce5c5927c260'
-  imageRepository: 'shawnstrongbertbot'
-  containerRegistry: 'bertbotregistry22180.azurecr.io'
+  dockerRegistryServiceConnection: 'Container Registry Connection - bert-bot'
+  imageRepository: 'web'
+  registryName: 'bertbotregistry22180.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/pipelines/Dockerfile'
   tag: '$(Build.BuildId)'
+  webAppName: 'bert-bot-22180'
   
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
@@ -69,7 +70,6 @@ stages:
     steps:
     - task: AzureWebAppContainer@1
       inputs:
-       appName: bert-bot-22180
-       #appName: $(webAppName)
+       appName: $(webAppName)
        azureSubscription: 'Resource Manager - bert-bot'
-       imageName: $(registryName)/$(webRepository):$(build.buildId)
+       imageName: $(registryName)/$(imageRepository):$(build.buildId)
