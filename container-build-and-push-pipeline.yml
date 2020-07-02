@@ -1,0 +1,54 @@
+# Docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- master
+
+resources:
+- repo: self
+
+variables:
+  # https://docs.microsoft.com/en-us/learn/modules/deploy-docker/4-deploy-docker
+  registryName: 'bertbotregistry22180.azurecr.io'
+  webAppName: 'bert-bot-22180'
+  webRepository: 'web'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+  tag: '$(Build.BuildId)'
+
+stages:
+- stage: 'Build'
+  displayName: 'Build and push'
+  jobs:  
+  - job: 'Build'
+    displayName: 'Build job'
+    pool:
+      vmImage: 'ubuntu-18.04'
+    steps:
+    - task: Docker@2
+      displayName: 'Build and push the image to container registry'
+      inputs:
+        command: buildAndPush
+        buildContext: $(Build.Repository.LocalPath)
+        repository: $(webRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: 'Container Registry Connection - bert-bot'
+        tags: |
+          $(tag)
+
+- stage: 'Deploy'
+  displayName: 'Deploy the container'
+  dependsOn: Build
+  jobs:
+  - job: 'Deploy'
+    displayName: 'Deploy job'
+    pool:
+      vmImage: 'ubuntu-18.04'
+    #variables:
+    #- group: Release
+    steps:
+    - task: AzureWebAppContainer@1
+      inputs:
+       appName: $(webAppName)
+       azureSubscription: 'Resource Manager - bert-bot'
+       imageName: $(registryName)/$(webRepository):$(build.buildId)
