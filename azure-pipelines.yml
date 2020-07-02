@@ -69,6 +69,7 @@ stages:
     steps:
     - task: AzureWebAppContainer@1
       inputs:
-       appName: $(webAppName)
+       appName: bert-bot-22180
+       #appName: $(webAppName)
        azureSubscription: 'Resource Manager - bert-bot'
        imageName: $(registryName)/$(webRepository):$(build.buildId)
