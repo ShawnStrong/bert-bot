@@ -41,11 +41,6 @@ stages:
       inputs:
         pathtoPublish: '$(System.DefaultWorkingDirectory)/build/libs/bert-1.0-SNAPSHOT-all.jar'
         artifactName: 'bert'
-  - job: DockerBuild
-    dependsOn: GradleBuild
-    pool:
-      vmImage: $(vmImageName)
-    steps:
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
@@ -56,6 +51,12 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
+  #- job: DockerBuild
+  #  dependsOn: GradleBuild
+  #  pool:
+  #    vmImage: $(vmImageName)
+  #  steps:
+    
 - stage: 'Deploy'
   displayName: 'Deploy the container'
   dependsOn: Build
