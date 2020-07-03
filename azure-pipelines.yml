@@ -26,7 +26,7 @@ stages:
   jobs:  
   - job: GradleBuild
     steps:
-    - script: ls -d "$(Build.ArtifactStagingDirectory)"/*
+    - script: ls -d $(Build.ArtifactStagingDirectory)
     - task: Gradle@2
       inputs:
         workingDirectory: ''
@@ -42,13 +42,13 @@ stages:
       inputs:
         pathtoPublish: '$(System.DefaultWorkingDirectory)/build/libs/bert-1.0-SNAPSHOT-all.jar'
         artifactName: 'bert'
-    - script: ls -d "$(Build.ArtifactStagingDirectory)"/*
+    - script: ls -d $(Build.ArtifactStagingDirectory)
   - job: DockerBuild
     dependsOn: GradleBuild
     pool:
       vmImage: $(vmImageName)
     steps:
-    - script: ls -d "$(Build.ArtifactStagingDirectory)"/*
+    - script: ls -d $(Build.ArtifactStagingDirectory)
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
