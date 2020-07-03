@@ -26,6 +26,7 @@ stages:
   jobs:  
   - job: GradleBuild
     steps:
+    - script: echo $(Build.ArtifactStagingDirectory)
     - task: Gradle@2
       inputs:
         workingDirectory: ''
@@ -46,6 +47,7 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
+    - script: echo $(Build.ArtifactStagingDirectory)
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
